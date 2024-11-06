@@ -5,7 +5,7 @@ import { Coins, Users, Lock, TrendingUp } from "lucide-react"
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex flex-col">
       <header className="border-b border-gray-800">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold">SocialToken</div>
@@ -20,7 +20,7 @@ export default function Landing() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-16 flex-grow">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold mb-4">Empower Your Community with Social Tokens</h1>
           <p className="text-xl text-gray-400 mb-8">Create, trade, and engage with personalized tokens on our cutting-edge Web3 platform.</p>
@@ -28,14 +28,14 @@ export default function Landing() {
             <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white">
               <Link href="/creator-registration">Launch as Creator</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white border-transparent">
+            <Button asChild size="lg" variant="outline" className="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white hover:text-white border-transparent">
               <Link href="/viewer-registration">Join as Fan</Link>
             </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="bg-gray-800 border-gray-700">
+           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
               <Coins className="w-8 h-8 mb-2 text-purple-500" />
               <CardTitle className="text-white">Create Tokens</CardTitle>
@@ -74,7 +74,7 @@ export default function Landing() {
         </div>
       </main>
 
-      <footer className="bg-gray-900 border-t border-gray-800 py-12 mt-auto">
+      <footer className="bg-gray-900 border-t border-gray-800 py-12">
         <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">Platform</h3>
