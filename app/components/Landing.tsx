@@ -1,7 +1,12 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Coins, Users, Lock, TrendingUp } from "lucide-react"
+import { WalletModalProvider, WalletMultiButton } from "@solana/wallet-adapter-react-ui"
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react"
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 export default function Landing() {
   return (
@@ -17,6 +22,13 @@ export default function Landing() {
               <li><Link href="#" className="hover:text-gray-300">FAQ</Link></li>
             </ul>
           </nav>
+          <ConnectionProvider endpoint={process.env.RPC_URL || "https://api.devnet.solana.com"}>
+            <WalletProvider wallets={[]} autoConnect>
+                <WalletModalProvider>
+                  <WalletMultiButton/>
+                </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
         </div>
       </header>
 
