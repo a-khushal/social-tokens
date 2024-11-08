@@ -12,33 +12,63 @@ export enum UserType{
   Viewer = 1,
 }
 
-export class UserAccount {
+export class UserAccount{
   owner: PublicKey;
   userType: UserType;
 
-  constructor(properties: { owner: Uint8Array; userType: UserType }) {
-    this.owner = new PublicKey(properties.owner);
-    this.userType = properties.userType;
+  static schema: Schema = new Map([
+    [UserAccount,
+      {
+        kind: 'struct',
+        fields: [
+          ['owner',[32]],
+          ['userType', 'u8'],
+        ]
+      }],
+  ]);
+  constructor(obj: {
+    owner: Uint8Array;
+    userType: UserType
+  }){
+    this.owner = new PublicKey(obj.owner);
+    this.userType = obj.userType;
+  }
+  serialize(): Uint8Array{
+    return serialize(UserAccount.schema, this);
+  }
+
+  deserialize(data: Buffer): UserAccount{
+    return deserialize(UserAccount.schema, UserAccount, data);
   }
 }
 
-const UserAccountSchema = (new Map<any, any>([
-  [
-    UserAccount,
-    {
-      kind: "struct",
-      fields: [
-        ["owner", [32]],
-        ["userType", "u8"], 
-      ],
-    },
-  ],
-]) as unknown) as Schema;
+// export class UserAccount {
+//   owner: PublicKey;
+//   userType: UserType;
 
-export function serializeUserAccount(userAccount: UserAccount): Uint8Array {
-  return serialize(UserAccountSchema, userAccount);
-}
+//   constructor(properties: { owner: Uint8Array; userType: UserType }) {
+//     this.owner = new PublicKey(properties.owner);
+//     this.userType = properties.userType;
+//   }
+// }
 
-export function deserializeUserAccount(data: Uint8Array): UserAccount {
-  return deserialize(UserAccountSchema, data) as UserAccount;
-}
+// const UserAccountSchema = (new Map<any, any>([
+//   [
+//     UserAccount,
+//     {
+//       kind: "struct",
+//       fields: [
+//         ["owner", [32]],
+//         ["userType", "u8"], 
+//       ],
+//     },
+//   ],
+// ]) as unknown) as Schema;
+
+// export function serializeUserAccount(userAccount: UserAccount): Uint8Array {
+//   return serialize(UserAccountSchema, userAccount);
+// }
+
+// export function deserializeUserAccount(data: Uint8Array): UserAccount {
+//   return deserialize(UserAccountSchema, data) as UserAccount;
+// }
