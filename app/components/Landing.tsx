@@ -5,10 +5,69 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import { Coins, Users, Lock, TrendingUp } from "lucide-react"
 import { WalletModalProvider, WalletMultiButton } from "@solana/wallet-adapter-react-ui"
-import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react"
+import { ConnectionProvider, useWallet, WalletProvider } from "@solana/wallet-adapter-react"
 import '@solana/wallet-adapter-react-ui/styles.css';
+import { clusterApiUrl, Connection, PublicKey, Transaction, SystemProgram, TransactionInstruction } from "@solana/web3.js"
+import {UserAccount, UserType} from "@/lib/utils";
+import "@solana/wallet-adapter-react-ui/styles.css"
+import { serializeUserAccount } from "@/lib/utils"
+import { Buffer } from "buffer";
+
+const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
+const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
 
 export default function Landing() {
+  const { publicKey, sendTransaction } = useWallet();
+  async function registerUser(userType: UserType){
+    
+    if(!publicKey){
+      alert("Connect wallet");
+      return;
+    }
+  
+    const connection = new Connection(RPC_URL);
+  
+    const userAccount = new UserAccount({
+      owner: publicKey.toBytes(), 
+      userType: userType
+    });
+  
+    // Serialize the UserAccount instance
+    const instructionData = serializeUserAccount(userAccount);
+    const instructionDataBuffer = Buffer.from(instructionData);
+    //const instructionData = serializeUserAccount(UserAccount);
+  
+    const userAccountPubkey = await PublicKey.createWithSeed(publicKey, "user-account", PROGRAM_ID);
+  
+    const transaction = new Transaction().add(
+      SystemProgram.createAccountWithSeed({
+        fromPubkey: publicKey,
+        newAccountPubkey: userAccountPubkey,
+        basePubkey: publicKey,
+        seed: "user-account",
+        space: 1000,
+        lamports: await connection.getMinimumBalanceForRentExemption(1000),
+        programId: PROGRAM_ID,
+      }),
+      new TransactionInstruction({
+        keys: [{ pubkey: userAccountPubkey, isSigner: false, isWritable: true}],
+        programId: PROGRAM_ID,
+        data: instructionDataBuffer,
+      })
+    );
+  
+    try{
+      const signature = await sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature);
+      alert(`User registered as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
+  
+    } catch(error){
+      console.error("Error registering user:", error);
+      alert("Failed to register user. See console for details.");
+    }
+    
+  
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex flex-col">
       <header className="border-b border-gray-800">
@@ -38,10 +97,10 @@ export default function Landing() {
           <p className="text-xl text-gray-400 mb-8">Create, trade, and engage with personalized tokens on our cutting-edge Web3 platform.</p>
           <div className="flex justify-center space-x-4">
             <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white">
-              <Link href="/creator-registration">Launch as Creator</Link>
+              <Link href="#" onClick={() => registerUser(UserType.Creator)}>Launch as Creator</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white hover:text-white border-transparent">
-              <Link href="/viewer-registration">Join as Fan</Link>
+              <Link href="#" onClick={() => registerUser(UserType.Viewer)}>Join as Fan</Link>
             </Button>
           </div>
         </div>
@@ -125,3 +184,4 @@ export default function Landing() {
     </div>
   )
 }
+
