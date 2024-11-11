@@ -22,7 +22,7 @@ export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
 
     callbacks: {
-        async jwt({token, account}: any) {
+        async jwt({token, account}: unknown) {
             const user = await db.user.findFirst({
                 where: {
                     sub: account?.providerAccountId ?? ""
@@ -35,7 +35,7 @@ export const authOptions = {
             
             return token;
         }, 
-        async session({ session, token }: any) {
+        async session({ session, token }: unknown) {
             const newSession: session = session as session
 
             if(newSession.user && token.uid) {
@@ -44,7 +44,7 @@ export const authOptions = {
 
             return newSession;
         },
-        async signIn({ user, account, profile }: any) {
+        async signIn({ user, account, profile }: unknown) {
             if(account?.provider === 'google') {
                 const email = user.email
 
