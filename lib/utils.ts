@@ -1,7 +1,7 @@
 import {clsx, type ClassValue} from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Schema, serialize, deserialize } from "borsh";
-import { PublicKey } from "@solana/web3.js";
+
 
 
 export function cn(...inputs: ClassValue[]){

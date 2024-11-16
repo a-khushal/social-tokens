@@ -10,7 +10,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    
     //const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
 
-    const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
+    //const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
     return (
         <SessionProvider>

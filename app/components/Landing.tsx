@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import '@solana/wallet-adapter-react-ui/styles.css';
 import WalletButton from "@/components/WalletConnect";
-import {sendAndConfirmTransaction ,clusterApiUrl, PublicKey,Keypair,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
+import {clusterApiUrl, PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
 import { UserType, serializeUserAccount, UserAccount } from "@/lib/utils";
 import { Buffer } from "buffer";
 // Constants
@@ -17,10 +17,10 @@ const connection = new Connection(RPC_URL, 'confirmed');
 export default function Landing() {
   const { publicKey, sendTransaction } = useWallet();
   // Helper function to log and show error details
-  function handleError(error: any, context: string) {
-    console.error(`Error in ${context}:`, error);
-    alert(`Error in ${context}. Check the console for more details.`);
-  }
+  // function handleError(error: any, context: string) {
+  //   console.error(`Error in ${context}:`, error);
+  //   alert(`Error in ${context}. Check the console for more details.`);
+  // }
   // Register user as Creator or Viewer
 async function registerUser(userType: UserType) {
   if (!publicKey) {
