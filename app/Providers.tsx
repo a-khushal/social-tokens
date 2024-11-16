@@ -8,14 +8,14 @@ import { useMemo } from "react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    
-    const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
+    //const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
 
-    const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
+    //const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
     return (
         <SessionProvider>
             <ConnectionProvider endpoint={process.env.RPC_URL || "https://api.devnet.solana.com"}>
-                    <WalletProvider wallets={[]} autoConnect>
+                    <WalletProvider wallets={[]}>
                         <WalletModalProvider>
                             {children}
                         </WalletModalProvider>
