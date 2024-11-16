@@ -1,7 +1,7 @@
 import {clsx, type ClassValue} from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Schema, serialize, deserialize } from "borsh";
-
+import { PublicKey } from "@solana/web3.js";
 
 
 export function cn(...inputs: ClassValue[]){
@@ -19,7 +19,7 @@ export class UserAccount{
   userType: UserType;
   token_balance: bigint;
 
-  static schema: Schema = new Map([
+  static scheme: Schema = new Map([
     [
       UserAccount,
       {
@@ -30,8 +30,7 @@ export class UserAccount{
           ["userType", "u8"],
           ["token_balance", "u64"],
         ],
-      },
-    ],
+      }],
   ]);
 
   constructor(obj: {owner: Uint8Array; is_initialized: boolean; userType: UserType; token_balance: bigint;}){
@@ -44,11 +43,11 @@ export class UserAccount{
 }
 
 export function serializeUserAccount(userAccount: UserAccount): Uint8Array{
-  return serialize(UserAccount.schema, userAccount);
+  return serialize(UserAccount.scheme, userAccount);
 }
 
 export function deserializeUserAccount(data: Buffer): UserAccount{
-  return deserialize(UserAccount.schema, UserAccount, data);
+  return deserialize(UserAccount.scheme, UserAccount, data);
 }
 
 
@@ -67,8 +66,7 @@ export class ContentAccess{
           ["ipfs_cid", [32]],
           ["required_tokens", "u64"],
         ],
-      },
-    ],
+      }],
   ]);
 
   constructor(obj: {creator_pubkey: Uint8Array; ipfs_cid: string; required_tokens: bigint;}){
