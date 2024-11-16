@@ -9,10 +9,6 @@ import { useMemo } from "react";
 export default function Providers({ children }: { children: React.ReactNode }) {
    
     const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
-<<<<<<< HEAD
-    
-=======
->>>>>>> eb34b5219d318ddacfa075bd9a2a433d8190ba49
 
     const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
