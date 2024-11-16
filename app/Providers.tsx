@@ -3,8 +3,6 @@
 import { SessionProvider } from "next-auth/react";
 import { WalletProvider, ConnectionProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import { useMemo } from "react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    
