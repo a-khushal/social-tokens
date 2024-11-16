@@ -1,73 +1,76 @@
-"use client"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+"use client";
 import { Coins, Users, Lock, TrendingUp } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
 import '@solana/wallet-adapter-react-ui/styles.css';
-import WalletButton from "@/components/WalletConnect"
-import '@solana/wallet-adapter-react-ui/styles.css';
-import { clusterApiUrl, Connection, PublicKey, Transaction, SystemProgram, TransactionInstruction } from "@solana/web3.js"
-import {UserAccount, UserType} from "@/lib/utils";
-import "@solana/wallet-adapter-react-ui/styles.css"
-import { serializeUserAccount } from "@/lib/utils"
+import WalletButton from "@/components/WalletConnect";
+import {sendAndConfirmTransaction ,clusterApiUrl, PublicKey,Keypair,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
+import { UserType, serializeUserAccount, UserAccount } from "@/lib/utils";
 import { Buffer } from "buffer";
-
+// Constants
 const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
-
+// Manually create a connection to avoid adapter issues
+const connection = new Connection(RPC_URL, 'confirmed');
 export default function Landing() {
   const { publicKey, sendTransaction } = useWallet();
-  async function registerUser(userType: UserType){
-    
-    if(!publicKey){
-      alert("Connect wallet");
-      return;
-    }
-  
-    const connection = new Connection(RPC_URL);
-  
-    const userAccount = new UserAccount({
-      owner: publicKey.toBytes(), 
-      userType: userType
-    });
-  
-    // Serialize the UserAccount instance
-    const instructionData = serializeUserAccount(userAccount);
-    const instructionDataBuffer = Buffer.from(instructionData);
-    //const instructionData = serializeUserAccount(UserAccount);
-  
-    const userAccountPubkey = await PublicKey.createWithSeed(publicKey, "user-account", PROGRAM_ID);
-  
-    const transaction = new Transaction().add(
-      SystemProgram.createAccountWithSeed({
-        fromPubkey: publicKey,
-        newAccountPubkey: userAccountPubkey,
-        basePubkey: publicKey,
-        seed: "user-account",
-        space: 1000,
-        lamports: await connection.getMinimumBalanceForRentExemption(1000),
-        programId: PROGRAM_ID,
-      }),
-      new TransactionInstruction({
-        keys: [{ pubkey: userAccountPubkey, isSigner: false, isWritable: true}],
-        programId: PROGRAM_ID,
-        data: instructionDataBuffer,
-      })
-    );
-  
-    try{
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature);
-      alert(`User registered as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
-  
-    } catch(error){
-      console.error("Error registering user:", error);
-      alert("Failed to register user. See console for details.");
-    }
-    
-  
+  // Helper function to log and show error details
+  function handleError(error: any, context: string) {
+    console.error(`Error in ${context}:`, error);
+    alert(`Error in ${context}. Check the console for more details.`);
   }
+  // Register user as Creator or Viewer
+async function registerUser(userType: UserType) {
+  if (!publicKey) {
+    alert("Please connect your wallet to continue.");
+    return;
+  }
+  const userAccount = new UserAccount({
+    owner: publicKey.toBytes(),
+    is_initialized: true,
+    userType: userType,
+    token_balance: BigInt(0),
+  });
+
+
+  const instructionData = serializeUserAccount(userAccount);
+  const instructionDataBuffer = Buffer.from(instructionData);
+
+  const userAccountPubkey = await PublicKey.createWithSeed(publicKey, "user-account", PROGRAM_ID);
+
+  const transaction = new Transaction().add(
+    SystemProgram.createAccountWithSeed({
+      fromPubkey: publicKey,
+      newAccountPubkey: userAccountPubkey,
+      basePubkey: publicKey,
+      seed: "user-account",
+      space: 1000,
+      lamports: await connection.getMinimumBalanceForRentExemption(1000),
+      programId: PROGRAM_ID,
+    }),
+    new TransactionInstruction({
+      keys: [{ pubkey: userAccountPubkey, isSigner: false, isWritable: true }],
+      programId: PROGRAM_ID,
+      data: instructionDataBuffer,
+    })
+  );
+
+  //const sig = await sendAndConfirmTransaction(connection, transaction, []);
+  //  console.log('Signature:', sig);
+
+  try{
+    const signature = await sendTransaction(transaction, connection);
+    await connection.confirmTransaction(signature, 'confirmed');
+    alert(`User registration as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
+  }catch(error){
+    console.error("Error registration user:", error);
+    alert("Failed to register user. See console for details.");
+  }
+
+}
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex flex-col">
       <header className="border-b border-gray-800">
