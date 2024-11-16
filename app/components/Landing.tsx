@@ -12,6 +12,7 @@ import {UserAccount, UserType} from "@/lib/utils";
 import "@solana/wallet-adapter-react-ui/styles.css"
 import { serializeUserAccount } from "@/lib/utils"
 import { Buffer } from "buffer";
+import { useWallet } from "@solana/wallet-adapter-react"
 
 const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
