@@ -61,7 +61,9 @@ async function registerUser(userType: UserType) {
   //  console.log('Signature:', sig);
 
   try{
-    const signature = await sendTransaction(transaction, connection);
+    const signature = await sendTransaction(transaction, connection, {
+      skipPreflight: true,
+  });
     await connection.confirmTransaction(signature, 'confirmed');
     alert(`User registration as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
   }catch(error){
