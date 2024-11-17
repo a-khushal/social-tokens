@@ -1,9 +1,58 @@
+"use client";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Upload, Play, Coins } from "lucide-react"
+import axios from "axios";
+import { useState } from "react";
 
 export default function Component() {
+  const uploadToPinata = async(file: File) => {
+    const url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const apiKey = "69bc12652fdfb42f5345";
+    const apiSecret = "ac09c873b88cd24fc25695e8c93628a2a4a255bd25722301d40d4cba19310e11";
+
+    try{
+      const response = await axios.post(url, formData, {
+        maxContentLength: Infinity,
+        headers: {
+          "Content-Type": `multipart/form-data`,
+          pinata_api_key: apiKey,
+          pinata_secret_api_key: apiSecret,
+        },
+      });
+      console.log("Uploaded to Pinata:", response.data);
+      return response.data.IpfsHash;
+    }catch(error){
+      console.error("Error uploading to Pinata:", error);
+      throw error;
+    }
+  };
+
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = async() =>{
+    if(!file){
+    alert("Please select a file to Upload!");
+    return;
+    }
+    try{
+    const ipfsHash = await uploadToPinata(file);
+    alert(`Content uploaded! IPFS Hash: ${ipfsHash}`);
+    }catch(error){
+    alert("Failed to upload conetnt.");
+    }
+  }
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="max-w-xl mx-auto">
@@ -62,10 +111,13 @@ export default function Component() {
           <CardTitle>Mint token to corresponding content</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
-          <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center mb-4">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <Button className="w-full">Upload Content</Button>
+          
+        <input
+        type="file"
+        onChange={handleFileChange}
+        className="mb-4"
+        />
+          <Button className="w-full" onClick={handleUpload}>Upload Content</Button>
         </CardContent>
       </Card>
     </div>
