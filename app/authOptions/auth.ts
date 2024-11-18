@@ -1,6 +1,6 @@
 import GoogleProvider from "next-auth/providers/google";
 import db from "@/app/db"
-import { Session } from "inspector/promises";
+import { Session } from "next-auth"
 
 export interface session extends Session {
     user: {
@@ -11,7 +11,7 @@ export interface session extends Session {
     }
 }
 
-export const authOptions = {
+export const AuthOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
