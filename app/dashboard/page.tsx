@@ -5,8 +5,17 @@ import { Input } from "@/components/ui/input"
 import { Upload, Play, Coins } from "lucide-react"
 import axios from "axios";
 import { useState } from "react";
+import { clusterApiUrl, PublicKey, Connection, Transaction, Keypair } from "@solana/web3.js";
+import {
+  createMint,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+} from "@solana/spl-token";
+
 
 export default function Component() {
+  const [mintAddress, setMintAddress] = useState<string | null>(null);
+  const [creatorTokenAccount, setCreatorTokenAccount] = useState<string | null>(null);
   const uploadToPinata = async(file: File) => {
     const url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
     const formData = new FormData();
@@ -30,6 +39,73 @@ export default function Component() {
       console.error("Error uploading to Pinata:", error);
       throw error;
     }
+  };
+
+  
+  const connection = new Connection(clusterApiUrl("devnet"), {
+    commitment: "confirmed",
+  });
+  const payer = Keypair.generate();
+
+  const generateMintAddress = async () => {
+    
+
+    await connection.requestAirdrop(payer.publicKey, 2*100);
+
+    const mint = await createMint(
+      connection,
+      payer,
+      payer.publicKey,
+      null,
+      2
+    );
+
+    setMintAddress(mint.toBase58());
+    alert(`New Mint Address Created: ${mint.toBase58()}`);
+  };
+
+  //Need to write function if token account is already created or not
+
+  const createTokenAccount = async() => {
+    if(!mintAddress){
+      alert("Please create a mint address first!");
+      return;
+    }
+
+    
+    const mint = new PublicKey(mintAddress);
+
+    const tokenAccount = await getOrCreateAssociatedTokenAccount(
+      connection,
+      payer,
+      mint,
+      payer.publicKey
+    );
+
+    setCreatorTokenAccount(tokenAccount.address.toBase58());
+    alert(`Creator Token Account Created: ${tokenAccount.address.toBase58()}`);
+  };
+
+  const mintTokens = async () => {
+    if(!mintAddress || !creatorTokenAccount){
+      alert("Please provide both mint address and creator token account.");
+      return;
+    }
+
+    
+    const mint = new PublicKey(mintAddress);
+    const tokenAccount = new PublicKey(creatorTokenAccount);
+
+    await mintTo(
+      connection,
+      payer,
+      mint,
+      tokenAccount,
+      payer.publicKey,
+      100
+    );
+
+    alert("Minted 100 tokens to creator's token account.");
   };
 
   const [file, setFile] = useState<File | null>(null);
@@ -111,7 +187,12 @@ export default function Component() {
           <CardTitle>Mint token to corresponding content</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
-          
+
+        <div>
+          <Button onClick={generateMintAddress}>Generate Mint Address</Button>
+          <Button onClick={createTokenAccount}>Create Token Account</Button>
+          <Button onClick={mintTokens}>Mint Tokens</Button>
+        </div> 
         <input
         type="file"
         onChange={handleFileChange}
