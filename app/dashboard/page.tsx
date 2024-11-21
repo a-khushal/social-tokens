@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Upload, Video, Music, Plus, Image, BarChart } from "lucide-react"
 import axios from "axios";
 import { useState } from "react";
-import { clusterApiUrl, PublicKey, Connection, Transaction, Keypair } from "@solana/web3.js";
+import { clusterApiUrl, PublicKey, Connection, Transaction, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import {
   createMint,
   getOrCreateAssociatedTokenAccount,
@@ -50,14 +50,15 @@ export default function Component() {
   const generateMintAddress = async () => {
     
 
-    await connection.requestAirdrop(payer.publicKey, 2*100);
+    await connection.requestAirdrop(payer.publicKey, 1 * LAMPORTS_PER_SOL);
+   
 
     const mint = await createMint(
       connection,
       payer,
       payer.publicKey,
       null,
-      2
+      0
     );
 
     setMintAddress(mint.toBase58());
