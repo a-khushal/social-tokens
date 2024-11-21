@@ -21,6 +21,7 @@ import { CreateToken } from "@/actions/createMint"
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { Loader } from "lucide-react"
 import { handleUploadToPinata } from "@/actions/uploadToPinata"
+import { UploadMetadataToDB } from "@/actions/metadataToDb"
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
@@ -71,7 +72,19 @@ export function TokenCreationForm() {
     setLoading(true)
     const ipfsHash = await handleUploadToPinata(values.content)
     const {mint, ata } = await CreateToken({ connection, wallet, supply: values.mintAmount })
+
+    const metadata = {
+      tokenName: values.name,
+      tokenSymbol: values.symbol,
+      description: values.description,
+      mintAddress: mint,
+      ataForMint: ata,
+      ipfsHash
+    }
+
     setLoading(false)
+    await UploadMetadataToDB({creatorPublicKey: wallet.publicKey.toBase58(), metadata})
+
     // toast({
     //   title: "Success",
     //   description: "Your token has been mint and the content has been uploaded successfully",

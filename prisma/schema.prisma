@@ -12,9 +12,20 @@ model User {
   email          String   @unique
   name           String?
   profilePicture String?
-  sub            String    @default("")
+  sub            String   @default("")
   publicKey      String?
   provider       Provider
+}
+
+model UploadedMetadata {
+  id               Int    @id @default(autoincrement())
+  creatorPublicKey String
+  tokenName        String
+  description      String
+  tokenSymbol      String
+  mintAddress      String
+  ataForMint       String
+  ipfsHash         String
 }
 
 enum Provider {
