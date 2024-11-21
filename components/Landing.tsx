@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
-import '@solana/wallet-adapter-react-ui/styles.css';
-import WalletButton from "@/components/WalletConnect";
 import {clusterApiUrl, PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
 import { UserType, serializeUserAccount, UserAccount } from "@/lib/utils";
 import { Buffer } from "buffer";
+
+
 // Constants
 const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
 // Manually create a connection to avoid adapter issues
+
 const connection = new Connection(RPC_URL, 'confirmed');
 export default function Landing() {
   const { publicKey, sendTransaction } = useWallet();
@@ -76,20 +77,18 @@ async function registerUser(userType: UserType) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex flex-col">
       <header className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold">SocialToken</div>
           <nav>
-            <ul className="flex space-x-4">
+              <ul className="flex space-x-4">
               <li><Link href="#" className="hover:text-gray-300">About</Link></li>
               <li><Link href="#" className="hover:text-gray-300">Features</Link></li>
               <li><Link href="#" className="hover:text-gray-300">Creators</Link></li>
               <li><Link href="#" className="hover:text-gray-300">FAQ</Link></li>
-            </ul>
+              </ul>
           </nav>
-          <WalletButton/>
-        </div>
+          </div>
       </header>
-
       <main className="container mx-auto px-4 py-16 flex-grow">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold mb-4">Empower Your Community with Social Tokens</h1>
