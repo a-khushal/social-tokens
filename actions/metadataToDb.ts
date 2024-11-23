@@ -8,7 +8,8 @@ interface Metadata {
     description: string,
     mintAddress: string,
     ataForMint: string,
-    ipfsHash: string
+    ipfsHash: string,
+    requiredTokens: number
 }
 
 export async function UploadMetadataToDB({ creatorPublicKey, metadata }: {
@@ -16,6 +17,7 @@ export async function UploadMetadataToDB({ creatorPublicKey, metadata }: {
     metadata: Metadata
 }) {
     try {
+        console.log(metadata)
         await db.uploadedMetadata.create({
             data: {
                 creatorPublicKey,
@@ -24,7 +26,8 @@ export async function UploadMetadataToDB({ creatorPublicKey, metadata }: {
                 description: metadata.description,
                 mintAddress: metadata.mintAddress,
                 ataForMint: metadata.ataForMint,
-                ipfsHash: metadata.ipfsHash
+                ipfsHash: metadata.ipfsHash,
+                requiredTokens: metadata.requiredTokens
             }
         })
 

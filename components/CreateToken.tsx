@@ -45,6 +45,10 @@ const formSchema = z.object({
     .number()
     .int()
     .positive({ message: "Mint amount must be a positive integer." }),
+  requiredTokens: z
+    .number()
+    .int()
+    .min(1, { message: "A mininum of 1 token is required for the user to access the content" })
 })
 
 export function TokenCreationForm() {
@@ -61,6 +65,7 @@ export function TokenCreationForm() {
       description: "",
       mintAmount: 1,
       content: undefined, 
+      requiredTokens: 1
     },
   });
 
@@ -79,6 +84,7 @@ export function TokenCreationForm() {
       description: values.description,
       mintAddress: mint,
       ataForMint: ata,
+      requiredTokens: values.requiredTokens,
       ipfsHash
     }
 
@@ -200,6 +206,27 @@ export function TokenCreationForm() {
                   </FormControl>
                   <FormDescription>
                     Specify how many tokens you want to mint initially.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="requiredTokens"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of tokens required to access the content</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      min={1}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Specify how many tokens the users needs to have to access the content.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
