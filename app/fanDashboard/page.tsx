@@ -5,12 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import WalletButton from "@/components/WalletConnect";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Play, Heart, Coins, Lock, Video, Music, Image } from 'lucide-react'
+import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConfirmRawTransaction } from '@solana/web3.js'
+import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 export default function FanDashboard() {
   const [tokenBalance, setTokenBalance] = useState(100)
+  const wallet = useWallet();
 
   const creators = [
     { name: "Alex", avatar: "/placeholder.svg?height=40&width=40", category: "Music" },
@@ -26,6 +31,71 @@ export default function FanDashboard() {
     { title: "Travel Vlog", creator: "Sam", type: "video", cost: 15, isFree: false },
     { title: "Digital Paintings", creator: "Jordan", type: "image", cost: 8, isFree: false },
   ]
+
+  const createATA = async (mint: string) => {
+   
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    if (!wallet.connected || !wallet.publicKey) {
+      alert("Connect Wallet Please");
+      return;
+  }
+
+  const feePayer = wallet.publicKey;
+  const mintAddress = new PublicKey(mint);
+
+  try {
+    
+    const ata = await getAssociatedTokenAddress(
+        mintAddress, //The mint address of creator
+        feePayer    
+    );
+
+
+
+    // Check if ATA already exists
+    const ataInfo = await connection.getAccountInfo(ata);
+    if (ataInfo) {
+        console.log(`ATA already exists: ${ata.toBase58()}`);
+        return;
+    }
+
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+
+    // Create the transaction for the ATA
+    const transaction = new Transaction({
+      feePayer,
+      recentBlockhash: blockhash, // Add the blockhash here
+    }).add(
+      createAssociatedTokenAccountInstruction(
+        feePayer,    // Fee payer
+        ata,         // Associated Token Account
+        feePayer,    // Wallet's public key (owner)
+        mintAddress  // Mint address
+      )
+    );
+
+    if (!wallet.signTransaction) {
+      alert("Your wallet does not support transaction signing.");
+      return;
+  }
+
+    const signedTransaction = await wallet.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+    });
+
+    console.log(`Transaction sent with signature: ${signature}`);
+    console.log(`ATA created at address: ${ata.toBase58()}`);
+} catch (error) {
+    console.error("Error creating ATA:", error);
+}
+
+  }
+
+  const tokenTransfer = () => {
+
+  }
 
   const handlePurchase = (cost: number) => {
     if (tokenBalance >= cost) {
@@ -46,6 +116,8 @@ export default function FanDashboard() {
             <Button variant="outline" className="bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900">
               Buy Tokens
             </Button>
+            <WalletButton />
+            <Button onClick={() => createATA("2SKpuBU9ksneBZD4nqbZkw75NE11HsSHsGRtW2BZh5aQ")}> Create Token</Button>
           </div>
         </nav>
 
@@ -53,6 +125,7 @@ export default function FanDashboard() {
           <h2 className="text-4xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
             Discover Amazing Content
           </h2>
+          
           <p className="text-gray-300">Support your favorite creators and unlock exclusive content</p>
         </header>
 
