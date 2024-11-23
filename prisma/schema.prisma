@@ -26,7 +26,8 @@ model UploadedMetadata {
   mintAddress      String
   ataForMint       String
   ipfsHash         String
-  requiredTokens   Int    @default(1)
+  requiredTokens   Int    
+  title            String 
 }
 
 enum Provider {

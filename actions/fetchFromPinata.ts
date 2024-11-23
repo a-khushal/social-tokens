@@ -12,7 +12,6 @@ export const fetchFromPinata = async (ipfsHash: string) => {
             responseType: "blob", 
         });
         
-        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error(error)

@@ -37,6 +37,10 @@ const formSchema = z.object({
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, { message: "Max file size is 50MB." })
     .refine((file) => !!file, { message: "File is required." }),
+  title: z
+    .string()
+    .min(5, { message: "Description must be at least 5 characters." })
+    .max(20, { message: "Description must not exceed 20 characters." }),
   description: z
     .string()
     .min(10, { message: "Description must be at least 10 characters." })
@@ -65,7 +69,8 @@ export function TokenCreationForm() {
       description: "",
       mintAmount: 1,
       content: undefined, 
-      requiredTokens: 1
+      requiredTokens: 1,
+      title: ""
     },
   });
 
@@ -85,6 +90,7 @@ export function TokenCreationForm() {
       mintAddress: mint,
       ataForMint: ata,
       requiredTokens: values.requiredTokens,
+      title: values.title,
       ipfsHash
     }
 
@@ -166,6 +172,22 @@ export function TokenCreationForm() {
                   {contentName && (
                     <p className="text-sm text-muted-foreground mt-2">Selected file: {contentName}</p>
                   )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Dance" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Provide a short catchy title.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

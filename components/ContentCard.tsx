@@ -21,7 +21,7 @@ export function ContentCard({ content }: {
             <ImageIcon className="w-12 h-12 text-gray-400" />
         </Link>
         <p className='text-sm font-thin'>(click the above image to view the content)</p>
-        <h3 className="text-lg font-semibold mb-1 mt-3">Title</h3>
+        <h3 className="text-lg font-semibold mb-1 mt-3">{content.title}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{content.description}</p>
       </CardContent>
       <CardFooter className="bg-gray-50 dark:bg-gray-800 p-4 rounded-b-lg">

@@ -17,7 +17,7 @@ export const uploadToPinata = async (file: File) => {
           pinata_secret_api_key: apiSecret,
         },
       });
-      console.log("Uploaded to Pinata:", response.data);
+      
       return response.data.IpfsHash;
     } catch (error) {
       console.error("Error uploading to Pinata:", error);

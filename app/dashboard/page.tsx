@@ -22,7 +22,8 @@ export interface Metadata {
   ataForMint: string,
   ipfsHash: string,
   requiredTokens: number
-  id: number
+  id: number,
+  title: string
 }
 
 export default function Component() {
