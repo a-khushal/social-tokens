@@ -5,9 +5,141 @@ import { Input } from "@/components/ui/input"
 import { Video, Music, Plus, Image, BarChart } from "lucide-react"
 import WalletButton from "@/components/WalletConnect";
 import { TokenCreationForm } from "@/components/CreateToken";
+import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConfirmRawTransaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 
 export default function Component() {
+  const [tokenBalance, setTokenBalance] = useState(100)
+  const [buyerAccount, setBuyerAccount] = useState<string | null>(null);
+
+  const wallet = useWallet();
+
+
+  //Just in case creator want to buy a token on someone else's
+  const createATA = async (mint: string)  => {
+   
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    if (!wallet.connected || !wallet.publicKey) {
+      alert("Connect Wallet Please");
+      return;
+  }
+
+  const feePayer = wallet.publicKey;
+  const mintAddress = new PublicKey(mint);
+
+  try {
+    
+    const ata = await getAssociatedTokenAddress(
+        mintAddress, //The mint address of creator
+        feePayer    
+    );
+
+
+
+    // Checking if ATA already exists
+    const ataInfo = await connection.getAccountInfo(ata);
+    if (ataInfo) {
+        console.log(`ATA already exists: ${ata.toBase58()}`);
+        setBuyerAccount(ata.toBase58());
+        return;
+    }
+
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+
+    // Create transaction for the ATA
+    const transaction = new Transaction({
+      feePayer,
+      recentBlockhash: blockhash, 
+    }).add(
+      createAssociatedTokenAccountInstruction(
+        feePayer,    // Fee payer
+        ata,         
+        feePayer,    // Wallet's public key (of owner i guess)
+        mintAddress  // Mint address
+      )
+    );
+
+    if (!wallet.signTransaction) {
+      alert("Your wallet does not support transaction signing.");
+      return;
+  }
+
+    const signedTransaction = await wallet.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+    });
+
+    console.log(`Transaction sent with signature: ${signature}`);
+    setBuyerAccount(ata.toBase58());
+    console.log(`ATA created at address: ${ata.toBase58()}`);
+    
+} catch (error) {
+    console.error("Error creating ATA:", error);
+    return;
+}
+
+  }
+
+  const tokenTransfer = async(mintAddress: string , creatorATA : string, buyerAccount: string,  requiredToken : number) => {
+    const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+    const cATA = new PublicKey(creatorATA);
+    if (!buyerAccount) {
+          alert("Please create Token Account First.");
+          return;
+    }
+    const bATA = new PublicKey(buyerAccount);
+    const walletPublicKey = wallet.publicKey;
+
+    if (!walletPublicKey) {
+      throw new Error("Wallet is not connected.");
+    }
+
+    // Validate accounts
+    const sourceAccountInfo = await connection.getAccountInfo(bATA);
+    if (!sourceAccountInfo) {
+      throw new Error("Source ATA does not exist or is not valid.");
+    }
+
+    const destinationAccountInfo = await connection.getAccountInfo(cATA);
+    if (!destinationAccountInfo) {
+      throw new Error("Destination ATA does not exist or is not valid.");
+    }
+
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+
+    const transaction = new Transaction({
+      recentBlockhash: blockhash,
+      feePayer: walletPublicKey,
+    });
+
+    const transferInstructio = createTransferInstruction(
+      cATA, // Source ATA
+      bATA, // Destination ATA
+      walletPublicKey, // Authority
+      requiredToken, // Token amount
+      [] //idk
+    );
+
+    transaction.add(transferInstructio);
+
+    if (!wallet.signTransaction) {
+      alert("Your wallet does not support transaction signing.");
+      return;
+  }
+
+    const signedTransaction = await wallet.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+    });
+    console.log(`Transaction sent with signature for tranfer token: ${signature}`);
+
+  }
   // const [mintAddress, setMintAddress] = useState<string | null>(null);
   // const [creatorTokenAccount, setCreatorTokenAccount] = useState<string | null>(null);
   
@@ -85,6 +217,7 @@ export default function Component() {
         <div className="container mx-auto p-6 space-y-8">
           <nav className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Creator Dashboard</h1>
+            <Button onClick={() => tokenTransfer("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg","HDjxY6k12eWJEZ9eEwfunaPzo2nsmdXEvtUpCwqbADQk","Ad373pYcsDSr2y43pzy92CEfP3wqh2PzbcGoZu4KDbJy",1)}>Transfer Token</Button>
             <WalletButton />
             <Input type="search" placeholder="Search Your Content" className="w-64 bg-gray-800 border-purple-500 text-white placeholder-gray-400" />
           </nav>

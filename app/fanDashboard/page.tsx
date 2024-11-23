@@ -57,8 +57,8 @@ export default function FanDashboard() {
     // Checking if ATA already exists
     const ataInfo = await connection.getAccountInfo(ata);
     if (ataInfo) {
-      setBuyerAccount(ata.toBase58());
         console.log(`ATA already exists: ${ata.toBase58()}`);
+        setBuyerAccount(ata.toBase58());
         return;
     }
 
@@ -99,83 +99,6 @@ export default function FanDashboard() {
 
   }
 
-
-
-  const tokenTransfer = async(mintAddress: string , creatorATA : string,  requiredToken : number) => {
-    const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-    const cATA = new PublicKey(creatorATA);
-    if (!buyerAccount) {
-          alert("Please create Token Account First.");
-          return;
-    }
-    const bATA = new PublicKey(buyerAccount);
-    const walletPublicKey = wallet.publicKey;
-
-    if (!walletPublicKey) {
-      throw new Error("Wallet is not connected.");
-    }
-
-    // Validate accounts
-    const sourceAccountInfo = await connection.getAccountInfo(bATA);
-    if (!sourceAccountInfo) {
-      throw new Error("Source ATA does not exist or is not valid.");
-    }
-
-    const destinationAccountInfo = await connection.getAccountInfo(cATA);
-    if (!destinationAccountInfo) {
-      throw new Error("Destination ATA does not exist or is not valid.");
-    }
-
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-
-    const transaction = new Transaction({
-      recentBlockhash: blockhash,
-      feePayer: walletPublicKey,
-    });
-
-    const transferInstructio = createTransferInstruction(
-      bATA, // Source ATA
-      cATA, // Destination ATA
-      walletPublicKey, // Authority
-      requiredToken, // Token amount
-      [] //idk
-    );
-
-    transaction.add(transferInstructio);
-
-    if (!wallet.signTransaction) {
-      alert("Your wallet does not support transaction signing.");
-      return;
-  }
-
-    const signedTransaction = await wallet.signTransaction(transaction);
-    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
-        skipPreflight: false,
-        preflightCommitment: "confirmed",
-    });
-    console.log(`Transaction sent with signature for tranfer token: ${signature}`);
-    // const tokenAccount = new PublicKey(buyerAccount);
-    // const mint = new PublicKey(mintAddress);
-    
-    // const transferInstruction = createTransferInstruction(
-    //   mint,
-    //   tokenAccount,
-    //   cATA,
-    //   requiredToken,
-    //   []
-    // );
-
-    // const transferTransaction = new Transaction().add(transferInstruction);
-    // const signedTransferTransaction = await wallet.signTransaction(transferTransaction);
-    // const transferSignature = await connection.sendRawTransaction(signedTransferTransaction.serialize(), {
-    //   skipPreflight: false,
-    //   preflightCommitment: "confirmed",
-    // });
-
-    // console.log("Token transferred to buyer. Transfer Signature:", transferSignature);
-
-  }
-
   const handlePurchase = (cost: number) => {
     if (tokenBalance >= cost) {
       setTokenBalance(tokenBalance - cost)
@@ -196,8 +119,7 @@ export default function FanDashboard() {
               Buy Tokens
             </Button>
             <WalletButton />
-            <Button onClick={() => createATA("2SKpuBU9ksneBZD4nqbZkw75NE11HsSHsGRtW2BZh5aQ")}> Create Token</Button>
-            <Button onClick={() => tokenTransfer("7clFC5gwALtMj2efvWLdNyehPzM9YkgJk2xxBRchledH","6gcFPuUH5VZiGc9sXwyzXDsFZYe9RzRXK7tY5TyYldta",1)}>Transfer Token</Button>
+            <Button onClick={() => createATA("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")}> Create Token</Button>
           </div>
         </nav>
 
