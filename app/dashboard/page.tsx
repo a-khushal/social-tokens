@@ -5,15 +5,28 @@ import { Input } from "@/components/ui/input"
 import { Video, Music, Plus, Image, BarChart } from "lucide-react"
 import WalletButton from "@/components/WalletConnect";
 import { TokenCreationForm } from "@/components/CreateToken";
-import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConfirmRawTransaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
+import { clusterApiUrl, Connection, PublicKey, Transaction } from '@solana/web3.js'
+import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { TokenContentGrid } from "@/components/ContentGrid";
+import { fetchParticularContent } from "@/actions/fetchParticularContent";
 
+
+export interface Metadata {
+  tokenName: string,
+  tokenSymbol: string,
+  description: string,
+  mintAddress: string,
+  ataForMint: string,
+  ipfsHash: string,
+  requiredTokens: number
+  id: number
+}
 
 export default function Component() {
-  const [tokenBalance, setTokenBalance] = useState(100)
+  // const [tokenBalance, setTokenBalance] = useState(100)
   const [buyerAccount, setBuyerAccount] = useState<string | null>(null);
 
   const wallet = useWallet();
@@ -26,7 +39,7 @@ export default function Component() {
     if (!wallet.connected || !wallet.publicKey) {
       alert("Connect Wallet Please");
       return;
-  }
+    }
 
   const feePayer = wallet.publicKey;
   const mintAddress = new PublicKey(mint);
@@ -211,6 +224,28 @@ export default function Component() {
   //   alert("Minted 100 tokens to creator's token account.");
   // };
 
+  const [metadata, setMetadata] = useState<Metadata[]>([])
+
+  useEffect(() => {
+    async function main() {
+      if(!wallet.publicKey) {
+        alert("Connect your wallet")
+        return;
+      }
+
+      const res = await fetchParticularContent({ creatorPublicKey: wallet.publicKey.toBase58()})
+      
+      if(res) {
+        setMetadata(res)
+      } else {
+        setMetadata([])
+      }
+      
+    }
+
+    main()
+  }, [wallet.publicKey])
+
   return (
     <div>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
@@ -279,8 +314,14 @@ export default function Component() {
                 </Card>
               ))}
             </div>
+            <div className="mt-10">
+              <TokenContentGrid metadata={metadata}/>
+            </div>
           </section>
-          <TokenCreationForm/>
+          <section className="mb-12">
+            <h3 className="text-2xl font-bold mb-6 flex justify-center items-center mt-20">Upload content and mint tokens</h3>
+            <TokenCreationForm/>
+          </section>
         </div>
       </div>
     </div>

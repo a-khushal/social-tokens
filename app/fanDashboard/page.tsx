@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,9 @@ import { Play, Heart, Coins, Lock, Video, Music, Image } from 'lucide-react'
 import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConfirmRawTransaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { fetchAllContent } from '@/actions/fetchAllContent'
+import { Metadata } from '../dashboard/page'
+import { TokenContentGrid } from '@/components/ContentGrid'
 
 export default function FanDashboard() {
   const [tokenBalance, setTokenBalance] = useState(100)
@@ -108,6 +111,28 @@ export default function FanDashboard() {
     }
   }
 
+  const [metadata, setMetadata] = useState<Metadata[]>([])
+
+  useEffect(() => {
+    async function main() {
+      if(!wallet.publicKey) {
+        alert("Connect your wallet")
+        return;
+      }
+
+      const res = await fetchAllContent()
+      
+      if(res) {
+        setMetadata(res)
+      } else {
+        setMetadata([])
+      }
+      
+    }
+
+    main()
+  }, [wallet.publicKey])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
       <div className="container mx-auto p-6 space-y-8">
@@ -183,6 +208,9 @@ export default function FanDashboard() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+            <div className='mt-10'>
+              <TokenContentGrid metadata={metadata}/>
             </div>
           </TabsContent>
 
