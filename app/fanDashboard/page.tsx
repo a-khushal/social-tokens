@@ -166,10 +166,10 @@ export default function FanDashboard() {
         <nav className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Fan Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-yellow-400"><Coins className="inline mr-2" />{tokenBalance} Tokens</span>
-            <button onClick={() => fetchTokenBalance("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")} disabled={!wallet.connected}>
+            
+            {/* <button onClick={() => fetchTokenBalance("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")} disabled={!wallet.connected}>
             Check Balance
-          </button>
+          </button> */}
             <Button variant="outline" className="bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900">
               Buy Tokens
             </Button>
@@ -256,9 +256,17 @@ export default function FanDashboard() {
                       <Badge variant="secondary" className="bg-green-500 text-white">Free</Badge>
                     </div>
                     <p className="text-sm text-gray-400 mb-4">By {item.creator}</p>
-                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-colors duration-300" onClick={() => alert("Enjoy the free content!")}>
+                    <Button className="w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white hover:from-yellow-600 hover:to-red-600 transition-colors duration-300" onClick={() => fetchTokenBalance("")}>Check Balance</Button>
+                    <span className="text-yellow-400"><Coins className="inline mr-2" />{tokenBalance*1000000000} Tokens</span>
+                    {item.isFree || tokenBalance >= {requiredTokens} ? (
+                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-colors duration-300" onClick={() => alert("Enjoy the free content!")}>
                       Watch Now
                     </Button>
+                    ) : (
+                      <Button className="w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white hover:from-yellow-600 hover:to-red-600 transition-colors duration-300" onClick={() => alert("Please buy more tokens to access this content.")}>
+                    Buy Tokens
+                    </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
