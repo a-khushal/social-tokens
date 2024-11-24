@@ -12,12 +12,10 @@ import { Play, Heart, Coins, Lock, Video, Music, Image } from 'lucide-react'
 import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConfirmRawTransaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { fetchAllContent } from '@/actions/fetchAllContent'
-import { Metadata } from '../dashboard/page'
-import { TokenContentGrid } from '@/components/ContentGrid'
+import { accessContent } from '@/actions/contentAccess'
 
 export default function FanDashboard() {
-  const [tokenBalance, setTokenBalance] = useState(100)
+  const [tokenBalance, setTokenBalance] = useState(0)
   const [buyerAccount, setBuyerAccount] = useState<string | null>(null);
 
   const wallet = useWallet();
@@ -102,36 +100,65 @@ export default function FanDashboard() {
 
   }
 
-  const handlePurchase = (cost: number) => {
-    if (tokenBalance >= cost) {
-      setTokenBalance(tokenBalance - cost)
-      alert(`Content purchased! Remaining balance: ${tokenBalance - cost} tokens`)
-    } else {
-      alert("Insufficient tokens. Please top up your balance.")
+  const programId = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
+  const userTokenAccount = new PublicKey("Ad373pYcsDSr2y43pzy92CEfP3wqh2PzbcGoZu4KDbJy");
+  const creatorTokenAccount = new PublicKey("HDjxY6k12eWJEZ9eEwfunaPzo2nsmdXEvtUpCwqbADQk");
+  const creatorAccount = new PublicKey("59gE1CgA51imxhy9yhDoGN4frhHR2Hxai7TZ8nM1jJ8X");
+
+
+  const handleAccess = async () => {
+    const connection = new Connection("https://api.devnet.solana.com");
+    try {
+      const result = await accessContent({
+        connection,
+        wallet,
+        programId,
+        userTokenAccount,
+        creatorTokenAccount,
+        creatorAccount,
+      });
+      console.log(`Content CID: ${result.ipfs_cid}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchTokenBalance = async(mint : string) =>{
+    const connection = new Connection("https://api.devnet.solana.com");
+    if(!wallet.connected || !wallet.publicKey){
+      alert("Connect wallet Please");
+      return;
+    }
+    if(!mint){
+      alert("No acount exist.");
+      return;
+    }
+    const mintAddress = new PublicKey(mint);
+    try{
+      const userATA = await getAssociatedTokenAddress(
+        mintAddress,
+        wallet.publicKey
+      );
+
+      const balance = await connection.getTokenAccountBalance(userATA);
+      console.log(`Token balance: ${balance.value.amount}`);
+      setTokenBalance(Number(balance.value.uiAmount));
+      setBuyerAccount(userATA.toBase58());
+    } catch(error){
+      console.error("Error fetching token balance:", error);
     }
   }
 
-  const [metadata, setMetadata] = useState<Metadata[]>([])
+  
 
-  useEffect(() => {
-    async function main() {
-      if(!wallet.publicKey) {
-        alert("Connect your wallet")
-        return;
-      }
-
-      const res = await fetchAllContent()
-      
-      if(res) {
-        setMetadata(res)
-      } else {
-        setMetadata([])
-      }
-      
-    }
-
-    main()
-  }, [wallet.publicKey])
+  // const handlePurchase = (cost: number) => {
+  //   if (tokenBalance >= cost) {
+  //     setTokenBalance(tokenBalance - cost)
+  //     alert(`Content purchased! Remaining balance: ${tokenBalance - cost} tokens`)
+  //   } else {
+  //     alert("Insufficient tokens. Please top up your balance.")
+  //   }
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
@@ -140,6 +167,9 @@ export default function FanDashboard() {
           <h1 className="text-2xl font-bold">Fan Dashboard</h1>
           <div className="flex items-center space-x-4">
             <span className="text-yellow-400"><Coins className="inline mr-2" />{tokenBalance} Tokens</span>
+            <button onClick={() => fetchTokenBalance("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")} disabled={!wallet.connected}>
+            Check Balance
+          </button>
             <Button variant="outline" className="bg-transparent border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900">
               Buy Tokens
             </Button>
@@ -208,9 +238,6 @@ export default function FanDashboard() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
-            <div className='mt-10'>
-              <TokenContentGrid metadata={metadata}/>
             </div>
           </TabsContent>
 
