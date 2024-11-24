@@ -259,9 +259,14 @@ export default function FanDashboard() {
                     <Button className="w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white hover:from-yellow-600 hover:to-red-600 transition-colors duration-300" onClick={() => fetchTokenBalance("")}>Check Balance</Button>
                     <span className="text-yellow-400"><Coins className="inline mr-2" />{tokenBalance*1000000000} Tokens</span>
                     {item.isFree || tokenBalance >= {requiredTokens} ? (
-                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-colors duration-300" onClick={() => alert("Enjoy the free content!")}>
+                      <a
+                      href={`https://gateway.pinata.cloud/ipfs/{ipfshash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full block text-center mt-4 bg-green-500 text-white py-2 rounded hover:bg-green-600 transition-colors duration-300"
+                    >
                       Watch Now
-                    </Button>
+                    </a>
                     ) : (
                       <Button className="w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white hover:from-yellow-600 hover:to-red-600 transition-colors duration-300" onClick={() => alert("Please buy more tokens to access this content.")}>
                     Buy Tokens
