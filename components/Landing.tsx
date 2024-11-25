@@ -10,7 +10,7 @@ import { Buffer } from "buffer";
 
 
 // Constants
-const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
+const PROGRAM_ID = new PublicKey("FyekTH8EfbD5gV6ZhfxPXirx1hQ2TBkrSjtgePnMtT47");
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
 // Manually create a connection to avoid adapter issues
 
