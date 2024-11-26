@@ -26,8 +26,15 @@ model UploadedMetadata {
   mintAddress      String
   ataForMint       String
   ipfsHash         String
-  requiredTokens   Int    
-  title            String 
+  requiredTokens   Int
+  title            String
+}
+
+model Interest {
+  id          Int    @id @default(autoincrement())
+  mintAddress String
+  creatorATA  String
+  userATA     String
 }
 
 enum Provider {

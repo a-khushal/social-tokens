@@ -15,10 +15,20 @@ export function UserSideContentCard({ content }: {
 }) {
     const wallet = useWallet()
     const { connection } = useConnection()
+    // const [userATA, setUserATA] = useState<string | undefined>("") 
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-    const handleShowInterest = () => {
+    // useEffect(() => {
+    //     async function main() {
+    //         const ata = await createATA({ mint: content.mintAddress, connection, wallet})
+    //         setUserATA(ata)
+    //     }
+
+    //     main()
+    // }, [connection, wallet, content])
+
+    const handleShowInterest = async () => {
         setIsDialogOpen(true)
     }
 
@@ -82,6 +92,7 @@ export function UserSideContentCard({ content }: {
                 mint={content.mintAddress}
                 wallet={wallet}
                 connection={connection}
+                ataForMint={content.ataForMint}
             />
         </Card>
     )

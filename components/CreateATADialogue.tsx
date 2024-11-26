@@ -4,17 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } from '@solana/spl-token'
 import { WalletContextState } from '@solana/wallet-adapter-react'
+import showInterestToDB from '@/actions/showInterestToDB'
 
-interface CreateATADialogProps {
-  isOpen: boolean
-  onClose: () => void
-  tokenName: string
-  mint: string
-  wallet: WalletContextState
-  connection: Connection
-}
-
-const createATA = async ({
+export const createATA = async ({
     mint,
     connection,
     wallet,
@@ -22,7 +14,7 @@ const createATA = async ({
     mint: string;
     connection: Connection;
     wallet: WalletContextState;
-  }): Promise<string | void> => {
+  }): Promise<string | undefined> => {
     if (!wallet.connected || !wallet.publicKey) {
       return;
     }
@@ -80,13 +72,26 @@ const createATA = async ({
     }
 }
 
-export function CreateATADialog({ isOpen, onClose, tokenName, mint, wallet, connection }: CreateATADialogProps) {
+interface CreateATADialogProps {
+  isOpen: boolean
+  onClose: () => void
+  tokenName: string
+  mint: string
+  wallet: WalletContextState
+  connection: Connection,
+  ataForMint: string
+}
+
+export function CreateATADialog({ isOpen, onClose, tokenName, mint, wallet, connection, ataForMint }: CreateATADialogProps) {
   const [isCreating, setIsCreating] = useState(false)
 
   const handleConfirm = async () => {
     setIsCreating(true)
     try {
       const ata = await createATA({ mint, wallet, connection })
+      if(ata) {
+        showInterestToDB({ mint, creatorATA: ataForMint, userATA: ata })
+      }
       alert(`Your ATA: ${ata}`)
       onClose()
     } catch (error) {
@@ -102,7 +107,7 @@ export function CreateATADialog({ isOpen, onClose, tokenName, mint, wallet, conn
             <DialogHeader>
             <DialogTitle>Create Associated Token Account</DialogTitle>
             <DialogDescription>
-                Do you want to create an Associated Token Account for {tokenName}?
+                Do you want to create an Associated Token Account for `{tokenName}`?
             </DialogDescription>
             </DialogHeader>
             <DialogFooter>
