@@ -99,61 +99,7 @@ export default function Component() {
 
   }
 
-  const tokenTransfer = async(mintAddress: string , creatorATA : string, buyerAccount: string,  requiredToken : number) => {
-    const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-    const cATA = new PublicKey(creatorATA);
-    if (!buyerAccount) {
-          alert("Please create Token Account First.");
-          return;
-    }
-    const bATA = new PublicKey(buyerAccount);
-    const walletPublicKey = wallet.publicKey;
-
-    if (!walletPublicKey) {
-      throw new Error("Wallet is not connected.");
-    }
-
-    // Validate accounts
-    const sourceAccountInfo = await connection.getAccountInfo(bATA);
-    if (!sourceAccountInfo) {
-      throw new Error("Source ATA does not exist or is not valid.");
-    }
-
-    const destinationAccountInfo = await connection.getAccountInfo(cATA);
-    if (!destinationAccountInfo) {
-      throw new Error("Destination ATA does not exist or is not valid.");
-    }
-
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-
-    const transaction = new Transaction({
-      recentBlockhash: blockhash,
-      feePayer: walletPublicKey,
-    });
-
-    const transferInstructio = createTransferInstruction(
-      cATA, // Source ATA
-      bATA, // Destination ATA
-      walletPublicKey, // Authority
-      requiredToken, // Token amount
-      [] //idk
-    );
-
-    transaction.add(transferInstructio);
-
-    if (!wallet.signTransaction) {
-      alert("Your wallet does not support transaction signing.");
-      return;
-  }
-
-    const signedTransaction = await wallet.signTransaction(transaction);
-    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
-        skipPreflight: false,
-        preflightCommitment: "confirmed",
-    });
-    console.log(`Transaction sent with signature for tranfer token: ${signature}`);
-
-  }
+  
   // const [mintAddress, setMintAddress] = useState<string | null>(null);
   // const [creatorTokenAccount, setCreatorTokenAccount] = useState<string | null>(null);
   
