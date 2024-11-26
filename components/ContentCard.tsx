@@ -7,7 +7,7 @@ import { Check, Copy, ImageIcon } from 'lucide-react'
 import { Metadata } from '@/app/dashboard/page'
 import { useCallback, useState } from 'react'
 
-interface Content extends Metadata {
+export interface Content extends Metadata {
     imageClickUrl: string
 }
 
@@ -57,7 +57,7 @@ export function ContentCard({ content }: {
   )
 }
 
-function CopyToClipboard({ text }: { text: string }) {
+export function CopyToClipboard({ text }: { text: string }) {
     const [copied, setCopied] = useState(false)
   
     const copyToClipboard = useCallback(() => {

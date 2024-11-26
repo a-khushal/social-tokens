@@ -13,6 +13,10 @@ import { clusterApiUrl, Connection, PublicKey, Keypair, Transaction, sendAndConf
 import { createAssociatedTokenAccount, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { accessContent } from '@/actions/contentAccess'
+import { Metadata } from '../dashboard/page'
+import { fetchAllContent } from '@/actions/fetchAllContent'
+import { TokenContentGrid } from '@/components/ContentGrid'
+import { UserContentGrid } from '@/components/UserContentGrid'
 
 export default function FanDashboard() {
   const [tokenBalance, setTokenBalance] = useState(0)
@@ -34,71 +38,6 @@ export default function FanDashboard() {
     { title: "Travel Vlog", creator: "Sam", type: "video", cost: 15, isFree: false },
     { title: "Digital Paintings", creator: "Jordan", type: "image", cost: 8, isFree: false },
   ]
-
-  const createATA = async (mint: string)  => {
-   
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    if (!wallet.connected || !wallet.publicKey) {
-      alert("Connect Wallet Please");
-      return;
-  }
-
-  const feePayer = wallet.publicKey;
-  const mintAddress = new PublicKey(mint);
-
-  try {
-    
-    const ata = await getAssociatedTokenAddress(
-        mintAddress, //The mint address of creator
-        feePayer    
-    );
-
-
-
-    // Checking if ATA already exists
-    const ataInfo = await connection.getAccountInfo(ata);
-    if (ataInfo) {
-        console.log(`ATA already exists: ${ata.toBase58()}`);
-        setBuyerAccount(ata.toBase58());
-        return;
-    }
-
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-
-    // Create transaction for the ATA
-    const transaction = new Transaction({
-      feePayer,
-      recentBlockhash: blockhash, 
-    }).add(
-      createAssociatedTokenAccountInstruction(
-        feePayer,    // Fee payer
-        ata,         
-        feePayer,    // Wallet's public key (of owner i guess)
-        mintAddress  // Mint address
-      )
-    );
-
-    if (!wallet.signTransaction) {
-      alert("Your wallet does not support transaction signing.");
-      return;
-  }
-
-    const signedTransaction = await wallet.signTransaction(transaction);
-    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
-        skipPreflight: false,
-        preflightCommitment: "confirmed",
-    });
-
-    console.log(`Transaction sent with signature: ${signature}`);
-    setBuyerAccount(ata.toBase58());
-    console.log(`ATA created at address: ${ata.toBase58()}`);
-    
-} catch (error) {
-    console.error("Error creating ATA:", error);
-    return;
-}
-
-  }
 
   const programId = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
   const userTokenAccount = new PublicKey("Ad373pYcsDSr2y43pzy92CEfP3wqh2PzbcGoZu4KDbJy");
@@ -160,6 +99,24 @@ export default function FanDashboard() {
   //   }
   // }
 
+  const [metadata, setMetadata] = useState<Metadata[]>([])
+  useEffect(() => {
+    async function main() {
+      if(!wallet.publicKey) {
+        alert("Connect your wallet")
+        return;
+      }
+      const res = await fetchAllContent()
+      
+      if(res) {
+        setMetadata(res)
+      } else {
+        setMetadata([])
+      }
+    }
+    main()
+  }, [wallet.publicKey])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
       <div className="container mx-auto p-6 space-y-8">
@@ -174,7 +131,7 @@ export default function FanDashboard() {
               Buy Tokens
             </Button>
             <WalletButton />
-            <Button onClick={() => createATA("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")}> Create Token</Button>
+            {/* <Button onClick={() => createATA("44vVXuohEg629U1dSzWcgpuSDoET4a7xNrtebwZzWzYg")}> Create Token</Button> */}
           </div>
         </nav>
 
@@ -238,6 +195,9 @@ export default function FanDashboard() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+            <div className='mt-10'>
+              <UserContentGrid metadata={metadata}/>
             </div>
           </TabsContent>
 
