@@ -7,11 +7,12 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import {clusterApiUrl, PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
 import { UserType, serializeUserAccount, UserAccount } from "@/lib/utils";
 import { Buffer } from "buffer";
+import WalletButton from "./WalletConnect";
 
 
 // Constants
-const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
-const RPC_URL = process.env.RPC_URL || clusterApiUrl("devnet");
+const PROGRAM_ID = new PublicKey("FyekTH8EfbD5gV6ZhfxPXirx1hQ2TBkrSjtgePnMtT47");
+const RPC_URL = 'https://rpc.testnet.soo.network/rpc';
 // Manually create a connection to avoid adapter issues
 
 const connection = new Connection(RPC_URL, 'confirmed');
@@ -65,7 +66,14 @@ async function registerUser(userType: UserType) {
     const signature = await sendTransaction(transaction, connection, {
       skipPreflight: true,
   });
-    await connection.confirmTransaction(signature, 'confirmed');
+  // const block = await connection.getLatestBlockhash("confirmed");
+    await connection.confirmTransaction(
+      signature
+     // ...block,
+    ,
+    "confirmed",);
+    
+
     alert(`User registration as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
   }catch(error){
     console.error("Error registration user:", error);
@@ -81,6 +89,7 @@ async function registerUser(userType: UserType) {
           <div className="text-2xl font-bold">SocialToken</div>
           <nav>
               <ul className="flex space-x-4">
+                <WalletButton/>
               <li><Link href="#" className="hover:text-gray-300">About</Link></li>
               <li><Link href="#" className="hover:text-gray-300">Features</Link></li>
               <li><Link href="#" className="hover:text-gray-300">Creators</Link></li>
