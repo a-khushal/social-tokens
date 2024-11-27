@@ -12,7 +12,6 @@ export enum UserType{
 }
 
 export class UserAccount{
-  owner: Uint8Array;
   is_initialized: boolean;
   userType: UserType;
   token_balance: bigint;
@@ -23,7 +22,6 @@ export class UserAccount{
       {
         kind: "struct",
         fields: [
-          ["owner", [32]],
           ["is_initialized", "u8"],
           ["userType", "u8"],
           ["token_balance", "u64"],
@@ -31,8 +29,7 @@ export class UserAccount{
       }],
   ]);
 
-  constructor(obj: {owner: Uint8Array; is_initialized: boolean; userType: UserType; token_balance: bigint;}){
-    this.owner = obj.owner;
+  constructor(obj: {is_initialized: boolean; userType: UserType; token_balance: bigint;}){
     this.is_initialized = obj.is_initialized;
     this.userType = obj.userType;
     this.token_balance = obj.token_balance;

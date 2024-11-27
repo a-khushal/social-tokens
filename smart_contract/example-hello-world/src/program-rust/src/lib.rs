@@ -65,7 +65,7 @@ fn register_user(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    //let accounts_iter = &mut accounts.iter();
+    let accounts_iter = &mut accounts.iter();
     let user_account = next_account_info(accounts_iter)?;
     //let creator_account = next_account_info(accounts_iter)?;
 
