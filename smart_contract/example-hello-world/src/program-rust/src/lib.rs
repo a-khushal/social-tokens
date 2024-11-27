@@ -65,9 +65,9 @@ fn register_user(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
+    //let accounts_iter = &mut accounts.iter();
     let user_account = next_account_info(accounts_iter)?;
-    let creator_account = next_account_info(accounts_iter)?;
+    //let creator_account = next_account_info(accounts_iter)?;
 
     if user_account.owner != program_id {
         msg!("User account does not have the correct program id");
@@ -91,12 +91,6 @@ fn register_user(
     user_data.token_balance = 0;
     user_data.serialize(&mut &mut user_account.data.borrow_mut()[..])?;
 
-    if user_type == UserType::Creator {
-        initialize_content_access(
-            creator_account,
-            instruction_data[2..].to_vec(),
-        )?;
-    }
 
     Ok(())
 }
