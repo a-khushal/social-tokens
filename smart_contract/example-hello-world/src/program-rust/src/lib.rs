@@ -65,9 +65,9 @@ fn register_user(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
+    //let accounts_iter = &mut accounts.iter();
     let user_account = next_account_info(accounts_iter)?;
-    let creator_account = next_account_info(accounts_iter)?;
+    //let creator_account = next_account_info(accounts_iter)?;
 
     if user_account.owner != program_id {
         msg!("User account does not have the correct program id");
