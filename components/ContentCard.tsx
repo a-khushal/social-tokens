@@ -11,6 +11,7 @@ import { Button } from './ui/button'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
 import { createTransferInstruction, getAccount } from '@solana/spl-token';
+import { deleteFromInterest } from '@/actions/deleteFromInterest'
 
 export interface Content extends Metadata {
     imageClickUrl: string
@@ -27,6 +28,7 @@ export function ContentCard({ content }: {
   const [balance, setBalance] = useState<number>()
 
   const tokenTransfer = async (
+    mintAddress: string,
     creatorATA: string,
     buyerAccounts: string[],
     requiredToken: number,
@@ -95,8 +97,18 @@ export function ContentCard({ content }: {
       preflightCommitment: "confirmed",
     });
   
-    console.log(`Transaction sent with signature for transferring tokens: ${signature}`);
+    console.log(`Transaction sent with signature for transferring tokens: ${signature}`)
+
     setIsTransferring(false)
+
+    const deleteFromInterestTableData = {
+      mintAddress,
+      creatorATA, 
+      buyerAccounts
+    }
+
+    deleteFromInterest(deleteFromInterestTableData)
+
     alert('transfered tokens')
     window.location.reload()
   };  
@@ -200,6 +212,7 @@ export function ContentCard({ content }: {
             )}
             <Button
               onClick={() => tokenTransfer(
+                content.mintAddress,
                 content.ataForMint,
                 interestedATAs,
                 content.requiredTokens

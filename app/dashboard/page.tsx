@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input"
 import WalletButton from "@/components/WalletConnect";
 import { TokenCreationForm } from "@/components/CreateToken";
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -51,7 +50,6 @@ export default function Component() {
           <nav className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Creator Dashboard</h1>
             <WalletButton />
-            <Input type="search" placeholder="Search Your Content" className="w-64 bg-gray-800 border-purple-500 text-white placeholder-gray-400" />
           </nav>
 
           <header className="text-center mb-12">
