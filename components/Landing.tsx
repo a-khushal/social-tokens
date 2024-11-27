@@ -30,15 +30,13 @@ async function registerUser(userType: UserType) {
     return;
   }
   const userAccount = new UserAccount({
-    owner: publicKey.toBytes(),
     is_initialized: true,
     userType: userType,
     token_balance: BigInt(0),
   });
 
 
-  const instructionData = serializeUserAccount(userAccount);
-  const instructionDataBuffer = Buffer.from(instructionData);
+  const instructionDataBuffer = Buffer.from([0, userType]);
 
   const userAccountPubkey = await PublicKey.createWithSeed(publicKey, "user-account", PROGRAM_ID);
 
