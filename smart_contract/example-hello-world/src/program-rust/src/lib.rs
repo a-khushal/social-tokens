@@ -91,12 +91,6 @@ fn register_user(
     user_data.token_balance = 0;
     user_data.serialize(&mut &mut user_account.data.borrow_mut()[..])?;
 
-    if user_type == UserType::Creator {
-        initialize_content_access(
-            creator_account,
-            instruction_data[2..].to_vec(),
-        )?;
-    }
 
     Ok(())
 }
