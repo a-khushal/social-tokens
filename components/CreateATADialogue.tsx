@@ -26,17 +26,11 @@ export const createATA = async ({
       const ata = await getAssociatedTokenAddress(
         mintAddress,
         feePayer 
-      );
-  
-      // Check if ATA already exists
-      const ataInfo = await connection.getAccountInfo(ata);
-      if (ataInfo) {
-        console.log(`ATA already exists at: ${ata.toBase58()}`);
-        return ata.toBase58();
-      }
-  
-      // Fetch the latest blockhash for the transaction
+      )
+
       const { blockhash } = await connection.getLatestBlockhash("confirmed");
+
+      console.log(blockhash)
   
       const transaction = new Transaction({
         feePayer,
@@ -98,6 +92,7 @@ export function CreateATADialog({ isOpen, onClose, tokenName, mint, wallet, conn
       console.error('Failed to create ATA:', error)
     } finally {
       setIsCreating(false)
+      window.location.reload()
     }
   }
 
@@ -107,7 +102,7 @@ export function CreateATADialog({ isOpen, onClose, tokenName, mint, wallet, conn
             <DialogHeader>
             <DialogTitle>Create Associated Token Account</DialogTitle>
             <DialogDescription>
-                Do you want to create an Associated Token Account for `{tokenName}`?
+                Do you want to create an Associated Token Account for `{tokenName}`? (has gas fees)
             </DialogDescription>
             </DialogHeader>
             <DialogFooter>

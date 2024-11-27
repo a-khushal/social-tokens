@@ -27,13 +27,12 @@ export function ContentCard({ content }: {
   const [balance, setBalance] = useState<number>()
 
   const tokenTransfer = async (
-    mintAddress: string,
     creatorATA: string,
     buyerAccounts: string[],
     requiredToken: number,
   ) => {
-    setIsTransferring(true);
-    const cATA = new PublicKey(creatorATA);
+    setIsTransferring(true)
+    const cATA = new PublicKey(creatorATA)
   
     if (buyerAccounts.length === 0) {
       alert("Please provide at least one buyer account.");
@@ -75,11 +74,11 @@ export function ContentCard({ content }: {
       }
   
       const transferInstruction = createTransferInstruction(
-        cATA, // Source ATA (creator's ATA)
-        bATA, // Destination ATA (buyer ATA)
-        walletPublicKey, // Authority
-        requiredToken * LAMPORTS_PER_SOL, // Token amount
-        [] // Empty array for additional signers (if any)
+        cATA,
+        bATA, 
+        walletPublicKey, 
+        requiredToken * LAMPORTS_PER_SOL, 
+        [] 
       );
   
       transaction.add(transferInstruction);
@@ -104,15 +103,9 @@ export function ContentCard({ content }: {
 
   useEffect(() => {
     const main = async () => {
-      const ataPubKey = new PublicKey(content.ataForMint)
-      const tokenAccountInfo = await getAccount(connection, ataPubKey)
-      const tokenBalance = Number(tokenAccountInfo.amount)
-      const tokenBalanceFormatted = tokenBalance / Math.pow(10, 9);
-      setBalance(tokenBalanceFormatted)
-
       try {
-        setIsLoading(true);
-        const data = await fetchInterested();
+        const data = await fetchInterested()
+        
         if (data.groupedData) {
           const matchingGroup = data.groupedData.find(
             (group) =>
@@ -127,11 +120,21 @@ export function ContentCard({ content }: {
       } catch (error) {
         console.error("Error fetching interested ATAs:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    main();
+    main()
+
+    const getATABalance = async () => {
+      const ataPubKey = new PublicKey(content.ataForMint)
+      const tokenAccountInfo = await getAccount(connection, ataPubKey)
+      const tokenBalance = Number(tokenAccountInfo.amount)
+      const tokenBalanceFormatted = tokenBalance / Math.pow(10, 9)
+      setBalance(tokenBalanceFormatted)
+    }
+
+    getATABalance()
   }, [content.mintAddress, content.ataForMint, connection]);
 
   return (
@@ -197,7 +200,6 @@ export function ContentCard({ content }: {
             )}
             <Button
               onClick={() => tokenTransfer(
-                content.mintAddress,
                 content.ataForMint,
                 interestedATAs,
                 content.requiredTokens

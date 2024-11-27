@@ -10,13 +10,16 @@ export function UserContentGrid({ metadata }: {
     }));
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {content.map((c, index) => (
-            <UserSideContentCard
-                key={index} 
-                content={c}
-            />
-        ))}
-    </div>
+        <>
+            <div className="flex justify-center items-center font-semibold text-2xl mb-5">All content</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {content.map((c, index) => (
+                    <UserSideContentCard
+                        key={index} 
+                        content={c}
+                    />
+                ))}
+            </div>
+        </>
   )
 }

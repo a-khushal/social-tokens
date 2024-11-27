@@ -1,19 +1,17 @@
 "use server"
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import db from "@/app/db"
 
 export default async function fetchInterested() {
   try {
-    const interests = await prisma.interest.groupBy({
+    const interests = await db.interest.groupBy({
       by: ['mintAddress', 'creatorATA'],
       _count: true,
     });
 
     const groupedData = await Promise.all(
       interests.map(async (group) => {
-        const users = await prisma.interest.findMany({
+        const users = await db.interest.findMany({
           where: {
             mintAddress: group.mintAddress,
             creatorATA: group.creatorATA,
@@ -29,10 +27,10 @@ export default async function fetchInterested() {
           userATAs: users.map((u) => u.userATA),
         };
       })
-    );
+    )
 
     return {
-        groupedData
+      groupedData
     }
   } catch (error) {
     console.error("Error fetching interests:", error);
