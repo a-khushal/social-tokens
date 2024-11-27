@@ -1,9 +1,7 @@
 import {
     Connection,
     PublicKey,
-    Transaction,
-    SystemProgram,
-    Keypair,
+    Transaction
   } from "@solana/web3.js";
   import { deserializeContentAccess } from "@/lib/utils";
   import { TOKEN_PROGRAM_ID, getAccount, createTransferInstruction } from "@solana/spl-token";
@@ -12,7 +10,6 @@ import {
   export async function accessContent({
     connection,
     wallet,
-    programId,
     userTokenAccount,
     creatorTokenAccount,
     creatorAccount,

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {clusterApiUrl, PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
-import { UserType, serializeUserAccount, UserAccount } from "@/lib/utils";
+import { PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connection } from "@solana/web3.js";
+import { UserType } from "@/lib/utils";
 import { Buffer } from "buffer";
 import WalletButton from "./WalletConnect";
 
@@ -29,11 +29,11 @@ async function registerUser(userType: UserType) {
     alert("Please connect your wallet to continue.");
     return;
   }
-  const userAccount = new UserAccount({
-    is_initialized: true,
-    userType: userType,
-    token_balance: BigInt(0),
-  });
+  // const userAccount = new UserAccount({
+  //   is_initialized: true,
+  //   userType: userType,
+  //   token_balance: BigInt(0),
+  // });
 
 
   const instructionDataBuffer = Buffer.from([0, userType]);
