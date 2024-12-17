@@ -8,16 +8,17 @@ import { PublicKey,  Transaction, SystemProgram, TransactionInstruction, Connect
 import { UserType } from "@/lib/utils";
 import { Buffer } from "buffer";
 import WalletButton from "./WalletConnect";
-
+import { useRouter } from "next/navigation";
 
 // Constants
-const PROGRAM_ID = new PublicKey("FyekTH8EfbD5gV6ZhfxPXirx1hQ2TBkrSjtgePnMtT47");
-const RPC_URL = 'https://rpc.testnet.soo.network/rpc';
+const PROGRAM_ID = new PublicKey("6ef4EwS3jZscUryqqZWNvoxJUpgPcLMnjv5MDTjrQiWZ");
+const RPC_URL = 'https://api.devnet.solana.com';
 // Manually create a connection to avoid adapter issues
 
 const connection = new Connection(RPC_URL, 'confirmed');
 export default function Landing() {
   const { publicKey, sendTransaction } = useWallet();
+  const router = useRouter(); 
   // Helper function to log and show error details
   // function handleError(error: any, context: string) {
   //   console.error(`Error in ${context}:`, error);
@@ -73,9 +74,15 @@ async function registerUser(userType: UserType) {
     
 
     alert(`User registration as ${userType === UserType.Creator ? "Creator" : "Viewer"}`);
+    if (userType === UserType.Creator) {
+      router.push("/dashboard"); 
+    } else if (userType === UserType.Viewer) {
+      router.push("/fanDashboard"); 
+    }
   }catch(error){
     console.error("Error registration user:", error);
     alert("Failed to register user. See console for details.");
+    
   }
 
 }

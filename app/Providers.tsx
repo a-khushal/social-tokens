@@ -4,11 +4,11 @@ import { SessionProvider } from "next-auth/react";
 import { WalletProvider, ConnectionProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 // import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-// import { useMemo } from "react";
+ import { useMemo } from "react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    
-    // const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
+    const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
 
     // const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
@@ -16,7 +16,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     return (
         <SessionProvider>
-            <ConnectionProvider endpoint={RPC_URL}>
+            <ConnectionProvider endpoint={endpoint}>
                     <WalletProvider wallets={[]}>
                         <WalletModalProvider>
                             {children}
