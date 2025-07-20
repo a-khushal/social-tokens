@@ -12,7 +12,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     // const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
-    const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL!
+    const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://api.devnet.solana.com"
 
     return (
         <SessionProvider>
